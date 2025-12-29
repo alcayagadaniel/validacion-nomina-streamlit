@@ -177,9 +177,14 @@ HASH_ADMIN = hash_password("admin123")
 
 
 def verificar_credenciales(usuario: str, password: str) -> bool:
-    if usuario != USUARIO_ADMIN:
+    admin_user = st.secrets.get("ADMIN_USER", "admin")
+    admin_pass = st.secrets.get("ADMIN_PASS", "")
+
+    if not admin_pass:
         return False
-    return hash_password(password) == HASH_ADMIN
+
+    return (usuario == admin_user) and (password == admin_pass)
+
 
 
 def generar_pdf_reajuste(
