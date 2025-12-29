@@ -1707,8 +1707,19 @@ def mostrar_login():
         st.markdown('<div class="image-align">', unsafe_allow_html=True)
 
         tema_actual = st.session_state.get("tema", "dark")
-        imagen_login = "login_image_dark.png" if tema_actual == "dark" else "login_image_light.png"
-        st.image(imagen_login, width=430)
+        from pathlib import Path
+
+        base_dir = Path(__file__).resolve().parent
+        tema_actual = st.session_state.get("tema", "dark")
+
+        nombre_img = "login_image_dark.png" if tema_actual == "dark" else "login_image_light.png"
+        img_path = base_dir / "assets" / nombre_img
+
+        if img_path.exists():
+            st.image(str(img_path), width=430)
+        else:
+            st.warning(f"Imagen no encontrada: assets/{nombre_img}")
+
 
         st.markdown("</div>", unsafe_allow_html=True)
 
