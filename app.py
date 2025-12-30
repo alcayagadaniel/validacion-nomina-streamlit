@@ -153,7 +153,7 @@ def generar_plantilla_excel() -> bytes:
 # CONSTANTES GENERALES
 # -----------------------------------------------------------
 
-COMPANY_NAME = "R&Q Ingeniería SPA"
+COMPANY_NAME = "RYQ Ingeniería SpA"
 
 MESES_ES = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -1378,6 +1378,7 @@ def aplicar_estilos_login():
             background-color: {btn_bg_hover};
             transform: scale(1.01);
         }}
+        
         </style>
     """, unsafe_allow_html=True)
 
@@ -1636,6 +1637,7 @@ def aplicar_estilos_app():
         .summary-card li {{
             margin-bottom: 2px;
         }}
+        
         </style>
     """, unsafe_allow_html=True)
 
@@ -1979,28 +1981,42 @@ def mostrar_app_reajuste():
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Menú")
 
-    # Menú único (botones)
+    # Menú con "píldoras" (look tipo Nintendo)
     menu_actual = st.session_state.get("menu_actual", "home")
 
-    if st.sidebar.button("🏠 Home", key="menu_home"):
-        menu_actual = "home"
-    if st.sidebar.button("👤 Mi perfil", key="menu_profile"):
-        menu_actual = "profile"
-    if st.sidebar.button("🕒 Historial", key="menu_history"):
-        menu_actual = "history"
-    if st.sidebar.button("✅ Procesos", key="menu_processes"):
-        menu_actual = "processes"
-    if st.sidebar.button("🧾 Validación de nómina", key="menu_validacion_nomina"):
-        menu_actual = "validacion_nomina"
+    opciones_menu = {
+        "🏠  Home": "home",
+        "👤  Mi perfil": "profile",
+        "🕒  Historial": "history",
+        "🧮  Procesos": "processes",
+        "🧾  Validación de nómina": "validacion_nomina",
+    }
 
-    if st.sidebar.button("⏻ Cerrar sesión", key="menu_logout"):
+    # Determinar opción seleccionada según session_state
+    etiqueta_actual = next((k for k, v in opciones_menu.items() if v == menu_actual), "🏠  Home")
+    lista_etiquetas = list(opciones_menu.keys())
+    idx_default = lista_etiquetas.index(etiqueta_actual)
+
+    seleccion = st.sidebar.radio(
+        "Navegación",
+        options=lista_etiquetas,
+        index=idx_default,
+        key="radio_menu_principal_v1",
+        label_visibility="collapsed",
+    )
+
+    menu_actual = opciones_menu.get(seleccion, "home")
+    st.session_state.menu_actual = menu_actual
+
+    st.sidebar.markdown("---")
+
+    if st.sidebar.button("⏻  Cerrar sesión", key="menu_logout"):
         st.session_state.autenticado = False
         st.session_state.usuario = None
         st.session_state.menu_actual = "home"
         st.session_state.post_login_redirect_done = False
         st.rerun()
 
-    st.session_state.menu_actual = menu_actual
 
     # ---------------- TOPBAR PARTE 1: ENLACES ----------------
     topbar_upper_html = """
@@ -2216,7 +2232,7 @@ def mostrar_app_reajuste():
     # === PEGA AQUÍ TU CÓDIGO DE PROCESOS EXISTENTE ===
 
     # ---------------- 2. Cargar archivo Excel de trabajadores ----------------
-    st.subheader("2. Cargar archivo Excel de trabajadores")
+    st.subheader("1. Cargar archivo Excel de trabajadores")
 
     plantilla_bytes = generar_plantilla_excel()
     st.download_button(
@@ -2491,7 +2507,7 @@ def mostrar_app_reajuste():
     )
 
     # ---------------- 1. INFORMACIÓN GENERAL DEL PROCESO ----------------
-    st.subheader("1. Información general del proceso")
+    st.subheader("2. Información general del proceso")
 
     empresa = st.text_input(
         "Empresa",
@@ -2584,16 +2600,7 @@ def mostrar_app_reajuste():
         unsafe_allow_html=True
     )
 
-    # ---------------- 2. CARGA DE ARCHIVO ----------------
-    st.subheader("2. Cargar archivo Excel de trabajadores")
 
-    plantilla_bytes = generar_plantilla_excel()
-    st.download_button(
-        label="Descargar plantilla Excel (formato sugerido)",
-        data=plantilla_bytes,
-        file_name="plantilla_reajuste_ipc.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
 
     # ---------------- 3. IPC ----------------
     st.subheader("3. Definir IPC a aplicar")
